@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>A N I S</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+    .fade-in {
+      animation: fadeIn 1s ease-in-out;
+    }
+  </style>
+</head>
+<body class="bg-black text-white flex items-center justify-center min-h-screen flex-col transition-all duration-500">
+
+  <!-- Intro Section -->
+  <div id="intro" class="text-center">
+    <h1 class="text-4xl font-bold mb-6">MyFav Girl</h1>
+    <button 
+      id="showBtn" 
+      class="bg-pink-600 hover:bg-pink-700 text-white font-semibold py-2 px-6 rounded-full transition"
+    >
+      Show Now
+    </button>
+  </div>
+
+  <!-- Hidden Photo Section -->
+  <div 
+    id="photoSection" 
+    class="hidden fixed inset-0 w-full h-full bg-black flex items-center justify-center"
+  >
+    <img 
+      src="girl.jpg" 
+      alt="MyFav Girl" 
+      class="w-full h-full object-cover fade-in" 
+    />
+  </div>
+
+  <!-- Audio -->
+  <audio id="bgAudio" src="backsound.mp3" preload="auto"></audio>
+
+  <script>
+    const showBtn = document.getElementById("showBtn");
+    const intro = document.getElementById("intro");
+    const photoSection = document.getElementById("photoSection");
+    const bgAudio = document.getElementById("bgAudio");
+
+    showBtn.addEventListener("click", () => {
+      intro.classList.add("hidden");
+      photoSection.classList.remove("hidden");
+      bgAudio.play();
+    });
+  </script>
+
+</body>
+</html>
