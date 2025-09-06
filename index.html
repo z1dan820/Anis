@@ -17,42 +17,127 @@
 </head>
 <body class="bg-black text-white flex items-center justify-center min-h-screen flex-col transition-all duration-500">
 
-  <!-- Intro Section -->
   <div id="intro" class="text-center">
     <h1 class="text-4xl font-bold mb-6">MyFav Girl</h1>
-    <button 
-      id="showBtn" 
+    <button
+      id="showBtn"
       class="bg-pink-600 hover:bg-pink-700 text-white font-semibold py-2 px-6 rounded-full transition"
     >
       Show Now
     </button>
   </div>
 
-  <!-- Hidden Photo Section -->
-  <div 
-    id="photoSection" 
+  <div
+    id="photoSection"
     class="hidden fixed inset-0 w-full h-full bg-black flex items-center justify-center"
   >
-    <img 
-      src="girl.jpg" 
-      alt="MyFav Girl" 
-      class="w-full h-full object-cover fade-in" 
-    />
+    <div id="photoContainer" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 p-4">
+      <img src="girl.jpg" alt="MyFav Girl" class="w-full h-auto object-cover rounded-lg fade-in" />
+    </div>
+
+    <div class="fixed bottom-4 left-4 flex gap-4">
+      <button onclick="goBack()" class="bg-gray-600 hover:bg-gray-700 text-white font-semibold py-2 px-4 rounded-full transition">
+        Kembali
+      </button>
+      <button onclick="showUploadForm()" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-full transition">
+        Tambah Foto
+      </button>
+    </div>
   </div>
 
-  <!-- Audio -->
+  <div id="uploadSection" class="hidden fixed inset-0 w-full h-full bg-black/80 flex items-center justify-center z-50">
+    <form id="uploadForm" class="bg-gray-800 p-8 rounded-lg shadow-lg text-center" enctype="multipart/form-data">
+      <h2 class="text-2xl font-bold mb-4">Unggah Foto Baru</h2>
+      <input type="file" name="newImage" id="newImage" accept="image/*" class="mb-4 text-white" required />
+      <button type="submit" class="bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-6 rounded-full transition">
+        Unggah
+      </button>
+      <button type="button" onclick="hideUploadForm()" class="bg-red-600 hover:bg-red-700 text-white font-semibold py-2 px-6 rounded-full transition mt-2">
+        Batal
+      </button>
+    </form>
+  </div>
+
   <audio id="bgAudio" src="backsound.mp3" preload="auto"></audio>
 
   <script>
     const showBtn = document.getElementById("showBtn");
     const intro = document.getElementById("intro");
     const photoSection = document.getElementById("photoSection");
+    const photoContainer = document.getElementById("photoContainer");
+    const uploadSection = document.getElementById("uploadSection");
+    const uploadForm = document.getElementById("uploadForm");
     const bgAudio = document.getElementById("bgAudio");
+
+    // Array untuk menyimpan nama file foto
+    let photos = ["girl.jpg"];
 
     showBtn.addEventListener("click", () => {
       intro.classList.add("hidden");
       photoSection.classList.remove("hidden");
       bgAudio.play();
+      loadPhotos();
+    });
+
+    function goBack() {
+      photoSection.classList.add("hidden");
+      intro.classList.remove("hidden");
+      bgAudio.pause();
+      bgAudio.currentTime = 0;
+    }
+
+    function showUploadForm() {
+      uploadSection.classList.remove("hidden");
+    }
+
+    function hideUploadForm() {
+      uploadSection.classList.add("hidden");
+    }
+
+    function loadPhotos() {
+      // Hapus semua foto kecuali yang pertama (girl.jpg)
+      photoContainer.innerHTML = `<img src="girl.jpg" alt="MyFav Girl" class="w-full h-auto object-cover rounded-lg fade-in" />`;
+      
+      // Di sini Anda perlu meminta daftar foto dari server
+      // Untuk demo, kita asumsikan server mengembalikan array nama file
+      // Contoh: fetch('/api/photos').then(res => res.json()).then(data => { ... });
+      
+      // Contoh statis
+      const newPhotos = ["girl2.jpg", "girl3.jpg", "girl4.jpg"];
+      newPhotos.forEach(photoName => {
+        const img = document.createElement("img");
+        img.src = photoName; // Pastikan ini mengarah ke direktori yang benar
+        img.alt = "MyFav Girl";
+        img.classList.add("w-full", "h-auto", "object-cover", "rounded-lg", "fade-in");
+        photoContainer.appendChild(img);
+      });
+    }
+
+    // Menggunakan fetch untuk mengirim formulir tanpa reload halaman
+    uploadForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const formData = new FormData(uploadForm);
+
+      try {
+        const response = await fetch('upload.php', {
+          method: 'POST',
+          body: formData,
+        });
+
+        const result = await response.json();
+        
+        if (result.success) {
+          alert('Foto berhasil diunggah!');
+          hideUploadForm();
+          // Muat ulang foto-foto setelah berhasil diunggah
+          loadPhotos(); 
+        } else {
+          alert('Gagal mengunggah foto: ' + result.message);
+        }
+      } catch (error) {
+        alert('Terjadi kesalahan saat mengunggah.');
+        console.error('Error:', error);
+      }
     });
   </script>
 
